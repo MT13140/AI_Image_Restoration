@@ -238,7 +238,7 @@ def scene_logo() -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
 
 def scene_user_photo() -> Optional[Tuple[Optional[np.ndarray], np.ndarray, np.ndarray, np.ndarray]]:
-    """用户真实照片：从历史对比图中取回原图，并用"实际被改动的区域"还原 Mask。"""
+    """真实测试样例：从历史对比图中取回原图，并用"实际被改动的区域"还原 Mask。"""
     comp_path = ROOT / "outputs" / "compare_20260913_154200.png"
     if not comp_path.exists():
         return None
