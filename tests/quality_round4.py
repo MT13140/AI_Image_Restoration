@@ -69,16 +69,16 @@ def _font(size: int):
 
 
 def load_id_photo() -> Optional[np.ndarray]:
-    """用户提供的证件照（含平铺水印）：从对比图左半部分取回。"""
+    """真实人像样例（含平铺水印）：从对比图左半部分取回。"""
     p = MAT_DIR / "id_original.png"
     if not p.exists():
         return None
     img = np.asarray(Image.open(p).convert("RGB"))
-    return img[50:545, 215:605].copy()          # 只取证件照本体
+    return img[50:545, 215:605].copy()          # 只取人像样例本体
 
 
 def load_id_photo_clean() -> Optional[np.ndarray]:
-    """同一张证件照的"无水印"参考（取上一轮修复结果的同区域）。"""
+    """同一张人像样例的"无水印"参考（取上一轮修复结果的同区域）。"""
     p = MAT_DIR / "id_prev_result.png"
     if not p.exists():
         return None
@@ -177,7 +177,7 @@ def logo_scene(cloth: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 def large_area_scene(cloth: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     gt = np.ascontiguousarray(cloth).copy()
     h, w = gt.shape[:2]
-    wm = np.array(stamp_text(gt, "个人证件照", w * 0.5, h * 0.45, 46, 120, tile=False), copy=True)
+    wm = np.array(stamp_text(gt, "真实测试样例", w * 0.5, h * 0.45, 46, 120, tile=False), copy=True)
     cv2.rectangle(wm, (int(w * 0.12), int(h * 0.20)), (int(w * 0.88), int(h * 0.66)), (250, 250, 250), -1)
     wm = np.ascontiguousarray((wm.astype(np.float32) * 0.82 + gt.astype(np.float32) * 0.18).astype(np.uint8))
     user = brush_stroke_mask((h, w), [(int(w * 0.08), int(h * 0.22), int(w * 0.92), int(h * 0.24)),
@@ -243,12 +243,12 @@ def face_and_cloth_scene(base: Optional[np.ndarray]) -> Optional[Tuple[np.ndarra
 
 
 def tiled_translucent_scene(base: Optional[np.ndarray]) -> Optional[Tuple[np.ndarray, np.ndarray, np.ndarray]]:
-    """平铺半透明水印（复现用户实际场景：个人证件照 · 30% 不透明度 · 42° 平铺）。"""
+    """平铺半透明水印（复现真实测试样例场景 · 30% 不透明度 · 42° 平铺）。"""
     if base is None:
         return None
     base = np.ascontiguousarray(base)
     h, w = base.shape[:2]
-    wm = stamp_text(base, "个人证件照", 0, 0, 18, 95, (255, 255, 255), angle=42, tile=True)
+    wm = stamp_text(base, "真实测试样例", 0, 0, 18, 95, (255, 255, 255), angle=42, tile=True)
     strokes = [(16, y, w - 16, y + 6) for y in range(24, h - 24, 52)]
     user = brush_stroke_mask((h, w), strokes, 40)
     return base, wm, user
@@ -454,7 +454,7 @@ def main(argv=None) -> int:
         return base, wm, user
 
     def user_real_scene():
-        """用户真实素材：平铺水印证件照（无干净真值，只验证"保留性 + 不露笔刷"）。"""
+        """真实测试样例：平铺水印人像样例（无干净真值，只验证"保留性 + 不露笔刷"）。"""
         if id_photo is None:
             return None
         base = np.ascontiguousarray(id_photo)
