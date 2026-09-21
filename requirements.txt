@@ -1,0 +1,50 @@
+# ============================================================================
+# AI 图片智能修复工具 —— 依赖清单
+# 环境：Windows 10/11 + Python 3.10（3.11 亦可）
+#
+# 说明：torch / torchvision 未写死在此文件里，因为 CPU 版与 CUDA 版来自不同的
+#       软件源（PyPI 上的 Windows 轮子不带 CUDA）。请按下面任一方式安装：
+#
+#   GPU（CUDA 12.1，推荐，需要 NVIDIA 显卡）：
+#     python -m pip install torch==2.5.1+cu121 torchvision==0.20.1+cu121 ^
+#         --index-url https://download.pytorch.org/whl/cu121
+#
+#   CPU（无显卡或安装失败时）：
+#     python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+#
+# install.bat 已自动完成以上全部步骤（先试 CUDA，失败回退 CPU）。
+# ============================================================================
+
+# --- 基础图像与数值计算 ---
+numpy==1.26.4
+Pillow==10.4.0
+opencv-python==4.11.0.86
+
+# --- Web 界面 ---
+# 下面是本项目实测通过的"兼容组合"，请勿单独升级其中某一项：
+#   * huggingface_hub>=1.0 删除了 HfFolder，gradio 4.44 会 import 失败
+#   * pydantic>=2.10 / fastapi>=0.140 会让 gradio_client 解析接口 schema 时报
+#     TypeError: argument of type 'bool' is not iterable，导致 Web 页面 500
+gradio==4.44.1
+gradio-client==1.3.0
+fastapi==0.115.0
+starlette==0.38.6
+pydantic==2.9.2
+huggingface_hub==0.25.2
+
+# --- OCR：PaddleOCR 的 PP-OCRv4 模型 + ONNXRuntime 推理 ---
+# rapidocr-onnxruntime 的 wheel 内已包含 det/cls/rec 三个 ONNX 模型，无需额外下载
+rapidocr-onnxruntime==1.3.24
+onnxruntime==1.23.2
+
+# --- 进度条（下载模型权重时显示进度） ---
+tqdm==4.70.1
+
+# --- LaMa Inpainting 模型封装 ---
+# 注意：该包的元数据把 Pillow 钉在 <10.0.0 并依赖 fire（fire 只被它自带的
+# 命令行入口 cli.py 使用）。本项目只调用 SimpleLama 推理接口，已实测与
+# Pillow 10.4 完全兼容，因此推荐用 --no-deps 安装，避免 Pillow 被降级：
+#     python -m pip install --no-deps simple-lama-inpainting==0.1.2
+# install.bat 就是这么做的；若直接 pip install -r 本文件也能工作（会额外装 fire
+# 并把 Pillow 降到 9.x），随后执行 `pip install Pillow==10.4.0` 可恢复推荐版本。
+simple-lama-inpainting==0.1.2

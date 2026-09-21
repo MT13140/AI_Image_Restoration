@@ -1,0 +1,80 @@
+# ============================================================================
+# AI Image Restoration —— Git 忽略规则
+# 原则：只提交源码 / 配置 / 测试 / 文档 / 轻量模型；一切运行产物、个人素材、
+#       密钥、大体积模型权重都不进仓库。
+# ============================================================================
+
+# ---------- Python 运行产物 ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---------- 虚拟环境（本机约 4.9 GB，绝不提交）----------
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# ---------- IDE / 编辑器 ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*.code-workspace
+desktop.ini
+Thumbs.db
+
+# ---------- 密钥 / 本地配置（安全红线）----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+secrets.*
+credentials.*
+
+# ---------- 运行日志 ----------
+logs/
+*.log
+
+# ---------- 运行产物：修复结果 / 对比图 / Mask / 质检报告 ----------
+# 这些目录同时包含本地测试图片与个人照片，绝不提交；
+# 保留目录说明文件，便于克隆后仍能看到结构。
+outputs/*
+!outputs/README.md
+temp/
+*.tmp
+~$*
+
+# ---------- 开发过程备份（历史快照，不进入公开仓库）----------
+backup/
+
+# ---------- 模型权重 ----------
+# 大体积权重不随仓库分发，获取方式见 models/README.md；
+# YuNet 人脸检测模型仅约 227 KB，属于运行依赖，随仓库一起分发。
+models/*
+!models/README.md
+
+# 大体积权重格式（任何目录下都忽略）
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
+# ONNX 权重：默认忽略，仅下面显式列出的轻量模型例外。
+# 注意顺序——Git 以“最后一条匹配的规则”为准，因此例外必须写在忽略之后。
+*.onnx
+!models/face_detection_yunet_2023mar.onnx
